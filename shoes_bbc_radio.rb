@@ -1,5 +1,10 @@
 Shoes.setup do
   # gem 'xmpp4r'
+  gem 'json_pure'
+  gem 'activerdf'
+  # gem 'activerdf_sparql'
+  gem 'mime-types'
+  gem 'memoize'
 end
 require 'lib/nowplaying'
 
@@ -24,18 +29,24 @@ class ShoesRadio < Shoes
       link("play") { @vid.play; @label.replace('about to play...') }, ", ",
       link("stop") { @vid.stop; @label.replace('about to stop...') }
     @label = para @vid.playing?    
-    animate(1) { @label.replace @vid.playing? ? 'playing' : 'stopped' }
+    animate(1) { @label.replace((@vid.playing?) ? 'playing' : 'stopped') }
     
-    @logger.info('creating listen')
+    stack :margin => 4 do
+      @episode_name = para ''
+      # @wikipedia_url = link('Wikipedia link')
+      @long_synopsis = para ''
+    end
+    
     begin
-      @nowplaying = NowPlaying.new(service)
+      @onnow_listener = OnNow.new(service)
     rescue Exception => e
       @logger.error e.message
       @logger.error e.backtrace.join("\n")
     end
-    @logger.info('listening')
-    @nowplaying.listen do |stuff|
-      @logger.info stuff
+    @onnow_listener.listen do |data|
+      @episode_name.replace data[:episode_name]
+      @long_synopsis.replace data[:long_synopsis]
+      # @wikipedia_url.replace data[:wikipedia_url]
     end
   end
 

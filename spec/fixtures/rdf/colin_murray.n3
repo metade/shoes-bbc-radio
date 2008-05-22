@@ -1,0 +1,31 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+@prefix po: <http://purl.org/ontology/po/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+_:broadcast
+ a po:Broadcast;
+ po:schedule_date """2008-05-20T21:00:00Z""";
+ po:broadcast_of _:version;
+ po:broadcast_on <http://www.bbc.co.uk/programmes/service/radio1>;
+.
+_:version
+ a po:Version;
+.
+<http://www.bbc.co.uk/programmes/b006wkx3>
+ dc:title """Colin Murray""";
+ a po:Brand;
+.
+<http://www.bbc.co.uk/programmes/b00bcmnn>
+ a po:Episode;
+ po:episode <http://www.bbc.co.uk/programmes/b006wkx3>;
+ po:version _:version;
+ po:long_synopsis """New music, alternative classics and The Black Hole - filled solely with downloadable only exclusives, rarities and musical specials.""";
+ dc:title """Colin Murray""";
+ po:synopsis """New music, alternative classics and The Black Hole.""";
+.
+<http://www.bbc.co.uk/programmes/service/radio1>
+ a po:Service;
+ dc:title """BBC Radio 1""";
+.
+

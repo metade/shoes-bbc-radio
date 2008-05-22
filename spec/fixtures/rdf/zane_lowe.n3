@@ -1,0 +1,30 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+@prefix po: <http://purl.org/ontology/po/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+_:broadcast
+ a po:Broadcast;
+ po:schedule_date """2008-05-20T18:00:00Z""";
+ po:broadcast_of _:version;
+ po:broadcast_on <http://www.bbc.co.uk/programmes/service/radio1>;
+.
+_:version
+ a po:Version;
+.
+<http://www.bbc.co.uk/programmes/b006wkth>
+ dc:title """Zane Lowe""";
+ a po:Brand;
+.
+<http://www.bbc.co.uk/programmes/b00bcmnj>
+ a po:Episode;
+ po:episode <http://www.bbc.co.uk/programmes/b006wkth>;
+ po:version _:version;
+ po:long_synopsis """Two hours of the best new and cutting-edge music. It's all about gigs - catching up with bands on the road and all the latest live music news.""";
+ dc:title """Zane Lowe""";
+ po:synopsis """It's all about gigs - catching up with bands on the road and all the latest music news.""";
+.
+<http://www.bbc.co.uk/programmes/service/radio1>
+ a po:Service;
+ dc:title """BBC Radio 1""";
+.
