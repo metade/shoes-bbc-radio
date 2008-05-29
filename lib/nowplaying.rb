@@ -10,6 +10,7 @@ require 'xmpp4r/pubsub'
 require 'base64'
 
 require 'active_rdf'
+require 'activerdf_sparql/sparql'
 require 'open3'
 require 'pp'
 
@@ -45,12 +46,12 @@ class OnNow
     # set up rdf store
     @adapter = ConnectionPool.add_data_source :type => :fetching
     @adapter.add_ntriples(File.read('data/foaf_homepages.nt'), nil)
-    # @sparql_adapter = ConnectionPool.add_data_source( #SparqlAdapter.new(
-    #   :type => :sparql, 
-    #   :url => 'http://dbpedia.org/sparql', 
-    #   :engine => :virtuoso) 
+    @sparql_adapter = ConnectionPool.add_data_source( #SparqlAdapter.new(
+      :type => :sparql, 
+      :url => 'http://dbpedia.org/sparql', 
+      :engine => :virtuoso) 
       
-    # memoize :dbpedia_ifp     
+    memoize :dbpedia_ifp     
   end
   
   def listen(&block)
@@ -75,15 +76,15 @@ class OnNow
     q.execute.last
   end
   
-  # def dbpedia_ifp(property, resource)
-  #   qs = "select distinct ?r where {?r <#{property.uri}> <#{resource.uri}> }"
-  #   result = @sparql_adapter.execute_sparql_query(qs).first
-  #   unless result.nil?
-  #     uri = result.first.uri
-  #     @adapter.fetch uri
-  #     uri
-  #   end
-  # end
+  def dbpedia_ifp(property, resource)
+    qs = "select distinct ?r where {?r <#{property.uri}> <#{resource.uri}> }"
+    result = @sparql_adapter.execute_sparql_query(qs).first
+    unless result.nil?
+      uri = result.first.uri
+      @adapter.fetch uri
+      uri
+    end
+  end
     
   def process_rdf
     # find the current episode
@@ -94,17 +95,17 @@ class OnNow
       brand = episode.po::episode
       brand_homepage = brand.foaf::homepage
 
-      # brand_dbpedia_uri = dbpedia_ifp(FOAF::homepage, brand_homepage) unless brand_homepage.nil?
-      # unless brand_dbpedia_uri.nil?
-      #   # TODO: owl:sameAs should be applied here?    
-      #   brand_dbpedia = RDFS::Resource.new(brand_dbpedia_uri)         
-      #   wikipedia_url = brand_dbpedia.foaf::page.uri unless brand_dbpedia.foaf::page.nil?
-      # end
+      brand_dbpedia_uri = dbpedia_ifp(FOAF::homepage, brand_homepage) unless brand_homepage.nil?
+      unless brand_dbpedia_uri.nil?
+        # TODO: owl:sameAs should be applied here?    
+        brand_dbpedia = RDFS::Resource.new(brand_dbpedia_uri)
+        wikipedia_url = brand_dbpedia.foaf::page.uri unless brand_dbpedia.foaf::page.nil?
+      end
       
       result = {
         :episode_name  => episode.dc::title,
         :long_synopsis => episode.po::long_synopsis,
-        # :wikipedia_url => wikipedia_url,
+        :wikipedia_url => wikipedia_url,
       }
     else    
       {}

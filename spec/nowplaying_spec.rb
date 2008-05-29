@@ -1,12 +1,17 @@
 require File.join(File.dirname(__FILE__), '..', 'lib', 'nowplaying')
 
+# monkey patch OnNow so we can grab the accessor in tests
+class OnNow
+  attr_accessor :adapter  
+end
+
 describe OnNow do
   before(:each) do
     @onnow = OnNow.new('radio1')
   end
   
   it "should process rdf and return an empty hash when given empty string" do
-    @onnow.send(:process_rdf, '').should == {}
+    @onnow.send(:process_rdf).should == {}
   end
 
   it "should return the dbpedia uri for a given show" do
@@ -18,7 +23,7 @@ describe OnNow do
   describe "processing onnow rdf" do 
     before(:each) do
       rdf = load_rdf 'colin_murray.n3'
-      @result = @onnow.send(:process_rdf, rdf)
+      @result = @onnow.send(:process_rdf)
     end
 
     it "should determine the episode title" do
@@ -32,19 +37,18 @@ describe OnNow do
     describe "should process another rdf file from an earlier show" do 
       before(:each) do
         rdf = load_rdf 'zane_lowe.n3'
-        @new_result = @onnow.send(:process_rdf, rdf) 
+        @new_result = @onnow.send(:process_rdf)
       end
 
       it "and determine the latest episode title" do
         @new_result[:episode_name].should == 'Colin Murray'
       end
     end
-  
-  
   end
   
-end
-
-def load_rdf(name)
-  File.read(File.join(File.dirname(__FILE__), 'fixtures', 'rdf', name))
+  def load_rdf(name)
+    rdf = File.read(File.join(File.dirname(__FILE__), 'fixtures', 'rdf', name))
+    triples = @onnow.send(:convert_to_ntriple, rdf)
+    @onnow.adapter.add_ntriples(triples, nil)
+  end
 end
