@@ -19,7 +19,13 @@ describe OnNow do
     uri = @onnow.send(:dbpedia_ifp, FOAF::homepage, resource)
     uri.should == 'http://dbpedia.org/resource/Colin_Murray'
   end
-    
+  
+  it "should return nil for a show missing data in dbpedia" do
+    resource = RDFS::Resource.new('http://www.bbc.com/radio1/nihal')
+    uri = @onnow.send(:dbpedia_ifp, FOAF::homepage, resource)
+    uri.should be_nil
+  end
+  
   describe "processing onnow rdf" do 
     before(:each) do
       rdf = load_rdf 'colin_murray.n3'

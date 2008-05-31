@@ -1,8 +1,3 @@
-# TODO: remove this once xmpp4r launched with hellomatty's patches
-$:.unshift '/usr/local/lib/ruby/site_ruby/1.8/'
-# TODO: remove this once Shoes supports openssl
-require '/usr/local/lib/ruby/1.8/openssl.rb'
-
 require 'rubygems'
 
 require 'xmpp4r'
@@ -10,7 +5,6 @@ require 'xmpp4r/pubsub'
 require 'base64'
 
 require 'active_rdf'
-require 'activerdf_sparql/sparql'
 require 'open3'
 require 'pp'
 
@@ -57,11 +51,11 @@ class OnNow
   def listen(&block)
     @sub.add_event_callback do |event|
       event.elements.each("/event/items/item/entry/onnow") do |rdf|
-        @adapter.add_ntriples(convert_to_ntriple(rdf), nil)
+        @adapter.add_ntriples(convert_to_ntriple(rdf.text), nil)
       end
       yield process_rdf
     end
-  end  
+  end
 
   private
   
@@ -89,7 +83,7 @@ class OnNow
   def process_rdf
     # find the current episode
     episode = latest_episode
-
+    
     unless episode.nil?
       # find the brand for the episode 
       brand = episode.po::episode
@@ -108,7 +102,7 @@ class OnNow
         :wikipedia_url => wikipedia_url,
       }
     else    
-      {}
+      { :episode_name  => 'unknown...', }
     end
   end
   
@@ -123,10 +117,12 @@ class OnNow
 
 end
 
-# # Debug code
-# on = OnNow.new("radio1")
-# on.listen do |stuff|
-#   p stuff
-# end
-# Thread.abort_on_exception = true
-# Thread.stop
+# Debug code
+if __FILE__ == $0
+  on = OnNow.new("radio1")
+  on.listen do |stuff|
+    p stuff
+  end
+  Thread.abort_on_exception = true
+  Thread.stop
+end

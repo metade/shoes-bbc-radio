@@ -1,11 +1,25 @@
 Shoes.setup do
-  # gem 'xmpp4r'
-  gem 'json_pure'
-  gem 'activerdf'
-  # gem 'activerdf_sparql'
-  gem 'mime-types'
   gem 'memoize'
+  gem 'xmpp4r'
+  gem 'json_pure'
+  gem 'mime-types'
+  gem 'activerdf'
+  gem 'activerdf_rdflite'
+  gem 'hpricot'
+  # gem 'activerdf_sparql'
 end
+
+# TODO: remove this once xmpp4r launched with hellomatty's patches
+$:.unshift '/usr/local/lib/ruby/site_ruby/1.8/'
+# TODO: remove this once Shoes supports openssl
+require '/usr/local/lib/ruby/1.8/openssl.rb'
+
+# # TODO: work out how we can get around using cgi
+$:.unshift '/usr/local/lib/ruby/1.8/'
+
+# TODO: remove this once we can build json gem...
+require '/usr/local/lib/ruby/gems/1.8/gems/activerdf_sparql-1.3.5/lib/activerdf_sparql/sparql'
+
 require 'lib/nowplaying'
 
 class ShoesRadio < Shoes
@@ -33,20 +47,20 @@ class ShoesRadio < Shoes
     
     stack :margin => 4 do
       @episode_name = para ''
-      # @wikipedia_url = link('Wikipedia link')
+      @wikipedia_url = link('Wikipedia link')
       @long_synopsis = para ''
     end
     
     begin
       @onnow_listener = OnNow.new(service)
+      @onnow_listener.listen do |data|
+        @episode_name.replace data[:episode_name]
+        @long_synopsis.replace data[:long_synopsis]
+        @wikipedia_url.replace data[:wikipedia_url]
+      end
     rescue Exception => e
       @logger.error e.message
       @logger.error e.backtrace.join("\n")
-    end
-    @onnow_listener.listen do |data|
-      @episode_name.replace data[:episode_name]
-      @long_synopsis.replace data[:long_synopsis]
-      # @wikipedia_url.replace data[:wikipedia_url]
     end
   end
 
