@@ -40,10 +40,10 @@ class OnNow
     # set up rdf store
     @adapter = ConnectionPool.add_data_source :type => :fetching
     @adapter.add_ntriples(File.read('data/foaf_homepages.nt'), nil)
-    @sparql_adapter = ConnectionPool.add_data_source( #SparqlAdapter.new(
-      :type => :sparql, 
-      :url => 'http://dbpedia.org/sparql', 
-      :engine => :virtuoso) 
+    # @sparql_adapter = ConnectionPool.add_data_source( #SparqlAdapter.new(
+    #   :type => :sparql, 
+    #   :url => 'http://dbpedia.org/sparql', 
+    #   :engine => :virtuoso) 
       
     memoize :dbpedia_ifp     
   end
@@ -59,7 +59,7 @@ class OnNow
 
   private
   
-  def latest_episode
+  def latest_episode    
     q = Query.new
     q.select(:episode)
     q.where(:episode, PO::version, :version)
@@ -71,13 +71,10 @@ class OnNow
   end
   
   def dbpedia_ifp(property, resource)
-    qs = "select distinct ?r where {?r <#{property.uri}> <#{resource.uri}> }"
-    result = @sparql_adapter.execute_sparql_query(qs).first
-    unless result.nil?
-      uri = result.first.uri
-      @adapter.fetch uri
-      uri
-    end
+    uri = "http://sindice.com/query/lookup?property=#{property.uri}&object=#{resource.uri}"
+    string = open(uri, 'Accept' => 'text/plain').read
+    result = string.split("\t")
+    result.first
   end
     
   def process_rdf
@@ -102,7 +99,7 @@ class OnNow
         :wikipedia_url => wikipedia_url,
       }
     else    
-      { :episode_name  => 'unknown...', }
+      {}
     end
   end
   

@@ -5,20 +5,12 @@ Shoes.setup do
   gem 'mime-types'
   gem 'activerdf'
   gem 'activerdf_rdflite'
-  gem 'hpricot'
-  # gem 'activerdf_sparql'
 end
 
 # TODO: remove this once xmpp4r launched with hellomatty's patches
 $:.unshift '/usr/local/lib/ruby/site_ruby/1.8/'
 # TODO: remove this once Shoes supports openssl
 require '/usr/local/lib/ruby/1.8/openssl.rb'
-
-# # TODO: work out how we can get around using cgi
-$:.unshift '/usr/local/lib/ruby/1.8/'
-
-# TODO: remove this once we can build json gem...
-require '/usr/local/lib/ruby/gems/1.8/gems/activerdf_sparql-1.3.5/lib/activerdf_sparql/sparql'
 
 require 'lib/nowplaying'
 
