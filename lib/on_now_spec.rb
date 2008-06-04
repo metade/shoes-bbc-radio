@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'nowplaying')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'on_now')
 
 # monkey patch OnNow so we can grab the accessor in tests
 class OnNow
